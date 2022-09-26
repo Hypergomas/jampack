@@ -12,3 +12,5 @@ pub async fn read_to_bytes(path: impl Into<String>) -> Result<Vec<u8>> {
         Err(e) => Err(e.to_string()),
     }
 }
+
+pub async fn save(path: impl Into<String>, data: Vec<u8>) {}

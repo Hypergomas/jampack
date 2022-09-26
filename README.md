@@ -49,7 +49,7 @@ impl Jam for MyType {
 ```
 
 &nbsp;&nbsp;&nbsp;&nbsp;
-Encoding data is done using a stove, which uses recipes in order to determine which assets it can and can't encode. If the original asset hasn't been modified, it will skip it.
+Encoding data is done using an stove, which uses recipes in order to cook asset files. If the original asset hasn't been modified, it will skip it.
 
 &nbsp;&nbsp;&nbsp;&nbsp;
 The recommended use of packagers is in build scripts.

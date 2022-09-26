@@ -1,6 +1,7 @@
 use crate::Result;
 use crate::fs;
 use crate::Jam;
+use std::path::Path;
 
 pub struct Jar {
     pub(crate) cat: u8,
@@ -29,7 +30,11 @@ impl Jar {
 }
 
 pub async fn jar(asset: impl Into<String>) -> Result<Jar> {
-    match fs::read_to_bytes(asset).await {
+    let asset = asset.into();
+    let path = Path::new(&asset)
+        .with_extension("jam");
+
+    match fs::read_to_bytes(path.to_str().unwrap()).await {
         Ok(b) => Ok(Jar::new(
             b[0],
             b[1],
@@ -40,8 +45,7 @@ pub async fn jar(asset: impl Into<String>) -> Result<Jar> {
 }
 
 pub async fn open<T: 'static + Jam>(asset: impl Into<String>) -> Result<T> {
-    let path = asset.into();
-    let jar = jar(path.clone())
+    let jar = jar(asset.into())
         .await?;
     T::decode(jar.ty, jar.data)
 }
