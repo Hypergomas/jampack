@@ -14,7 +14,7 @@ By default, JamPack does not ship with any encoders or decoders, but you can ena
 [dependencies.jampack]
 version = "0.1.0"
 features = [
-    "image-encode" # Enables encoding images to different formats using the 'image' crate
+    "image-encode", # Enables encoding images to different formats using the 'image' crate
     "image-decode" # Enables decoding raw images with the 'image' crate
 ]
 ```
