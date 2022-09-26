@@ -22,9 +22,13 @@ impl Jar {
         out.append(&mut self.data);
         out
     }
+
+    pub fn unpack(self) -> Vec<u8> {
+        self.data
+    }
 }
 
-pub async fn raw(asset: impl Into<String>) -> Result<Jar> {
+pub async fn jar(asset: impl Into<String>) -> Result<Jar> {
     match fs::read_to_bytes(asset).await {
         Ok(b) => Ok(Jar::new(
             b[0],
@@ -37,7 +41,7 @@ pub async fn raw(asset: impl Into<String>) -> Result<Jar> {
 
 pub async fn open<T: 'static + Jam>(asset: impl Into<String>) -> Result<T> {
     let path = asset.into();
-    let raw = raw(path.clone())
+    let jar = jar(path.clone())
         .await?;
-    T::decode(raw.ty, raw.data)
+    T::decode(jar.ty, jar.data)
 }
