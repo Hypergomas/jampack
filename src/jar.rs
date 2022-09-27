@@ -27,6 +27,16 @@ impl Jar {
     pub fn unpack(self) -> Vec<u8> {
         self.data
     }
+
+    pub fn cat(&self) -> u8 {
+        self.cat
+    }
+    pub fn ty(&self) -> u8 {
+        self.ty
+    }
+    pub fn data(&self) -> &Vec<u8> {
+        &self.data
+    }
 }
 
 pub async fn jar(asset: impl Into<String>) -> Result<Jar> {
@@ -47,5 +57,13 @@ pub async fn jar(asset: impl Into<String>) -> Result<Jar> {
 pub async fn open<T: 'static + Jam>(asset: impl Into<String>) -> Result<T> {
     let jar = jar(asset.into())
         .await?;
-    T::decode(jar.ty, jar.data)
+    if jar.cat != T::jam_idx() {
+        Err(format!(
+            "Cannot unjar asset. Provided type 'T' has jam index {}, jar has index {}.",
+            jar.cat,
+            T::jam_idx(),
+        ))
+    } else {
+        T::unjar(jar.ty, jar.data)
+    }
 }
