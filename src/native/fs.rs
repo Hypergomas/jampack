@@ -26,3 +26,19 @@ pub async fn save(path: impl Into<String>, data: Vec<u8>) {
     file.write(&data)
         .expect("Could not write data to file");
 }
+
+pub async fn delete(path: impl Into<String>) {
+    let path: String = path.into();
+    let path = Path::new(&path);
+
+    if path.is_file() {
+        let _ = fs::remove_file(path);
+    } else if path.is_dir() {
+        let _ = fs::remove_dir_all(path);
+    }
+}
+
+pub async fn exists(path: impl Into<String>) -> bool {
+    let path = path.into();
+    Path::new(&path).exists()
+}

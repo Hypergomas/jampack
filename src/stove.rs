@@ -1,6 +1,8 @@
 use crate::Result;
 use crate::fs;
 use crate::Jar;
+use crate::Lock;
+use std::path::Path;
 use pollster::*;
 
 #[derive(Default)]
@@ -11,7 +13,7 @@ pub struct Stove {
 impl Stove {
     pub fn new() -> Result<Self> {
         #[cfg(target_arch = "wasm32")]
-        return Err("Cooking assets in a web environment is unsupported as of the moment".to_owned());
+        unsupported!();
         Ok(Self::default())
     }
     pub fn with_recipe(mut self, r: Recipe) -> Self {
@@ -19,10 +21,31 @@ impl Stove {
         self
     }
 
+    pub fn add_recipe(&mut self, r: Recipe) {
+        self.recipes.push(r);
+    }
+
     pub fn cook(&self, path: impl Into<String>, out: impl Into<String>) {
         let path = path.into();
         let out = out.into();
 
+        let mut lock = Lock::load()
+            .block_on();
+
+        // Remove deleted files from lock
+        for file in lock.files() {
+            let file_path = Path::new(&file);
+            if !file_path.exists() {
+                lock.remove_file(&file);
+
+                let out_path = file_path.with_extension("jam");
+                let out_path = out_path.to_str().unwrap();
+                let out_path = out_path.replace(path.as_str(), out.as_str());
+                fs::delete(out_path).block_on();
+            }
+        }
+
+        // Loop through folder entries
         for entry in walkdir::WalkDir::new(&path) {
             // Get entry info
             let entry = entry.expect("Could not get walkdir entry");
@@ -40,6 +63,8 @@ impl Stove {
             let out_path = out_path.to_str().unwrap();
             let out_path = out_path.replace(path.as_str(), out.as_str());
 
+            let entry_path = entry_path.to_str().unwrap();
+
             // Get recipe
             let recipe = match self.get_recipe_by_format(fmt) {
                 Some(r) => r,
@@ -47,15 +72,33 @@ impl Stove {
             };
 
             // Load file data
-            let data = fs::read_to_bytes(entry_path.to_str().unwrap())
+            let data = fs::read_to_bytes(entry_path)
                 .block_on()
                 .expect("Could not open file");
+            
+            // Edit file lock
+            {
+                let hash = Lock::gen_hash(&data);
+                // Get file hash
+                match lock.get_file(entry_path) {
+                    Some(h) => {
+                        if h != hash {
+                            lock.set_file(entry_path, hash); // Override hash if changes were made
+                        } else {
+                            continue; // Skip file if no changes were made
+                        }
+                    },
+                    None => lock.set_file(entry_path, hash), // Create new hash
+                }
+            }
             
             // Cook jam
             let jar = recipe.cook(data);
             fs::save(out_path, jar.pack())
                 .block_on();
         }
+
+        lock.save().block_on();
     }
 
     fn get_recipe_by_format(&self, fmt: impl Into<String>) -> Option<&Recipe> {

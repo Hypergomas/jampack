@@ -13,4 +13,15 @@ pub async fn read_to_bytes(path: impl Into<String>) -> Result<Vec<u8>> {
     }
 }
 
-pub async fn save(path: impl Into<String>, data: Vec<u8>) {}
+pub async fn save(path: impl Into<String>, data: Vec<u8>) {
+    unsupported!()
+}
+
+pub async fn delete(path: impl Into<String>) {
+    unsupported!()
+}
+
+pub async fn exists(path: impl Into<String>) -> bool {
+    let path = path.into();
+    Path::new(&path).exists()
+}
