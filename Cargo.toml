@@ -7,7 +7,7 @@ description = "Lightweight, asynchronous and extensible asset framework made for
 license = "MIT"
 #license-file = "LICENSE"
 repository = "https://github.com/WrapFX/jampack"
-keywords = ["game", "app", "engine", "gamedev", "jampack", "asset", "encoding", "decoding"]
+keywords = ["game", "app", "gamedev", "jampack", "encoding"]
 
 [dependencies]
 log = "0.4.17"
