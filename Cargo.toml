@@ -7,11 +7,14 @@ description = "Lightweight, asynchronous and extensible asset framework made for
 license = "MIT"
 #license-file = "LICENSE"
 repository = "https://github.com/WrapFX/jampack"
+keywords = ["game", "app", "engine", "gamedev", "jampack", "asset", "encoding", "decoding"]
 
 [dependencies]
 log = "0.4.17"
-walkdir = "2.3.2"
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 pollster = "0.2.5"
+walkdir = "2.3.2"
 sha1 = "0.10.5"
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
