@@ -1,74 +1,74 @@
 <div align="center">
 
-# JamPack
+![JamPack Banner](./banner.png)
 
 </div>
 
-&nbsp;&nbsp;&nbsp;&nbsp;
-JamPack is an extensible asset pipeline made for games and apps. You can compile files into jars and decode them using the built-in encoders, or even make your own!
+**NOTE:** JamPack is currently being made as a highschooler's hobby project. Suggestions are very much appreciated!
 
 &nbsp;&nbsp;&nbsp;&nbsp;
-By default, JamPack does not ship with any encoders or decoders, but you can enable them by enabling their respective cargo features.
-
-```TOML
-[dependencies.jampack]
-version = "0.1.0"
-features = [
-    "image-encode", # Enables encoding images to different formats using the 'image' crate
-    "image-decode" # Enables decoding raw images with the 'image' crate
-]
-```
+JamPack is a lightweight, asynchronous and extensible asset framework made for use in games and apps. By default, it doesn't come with any encoders or decoders, but it's easy to make your own!
 
 &nbsp;&nbsp;&nbsp;&nbsp;
-JamPack also has a binary that can be used to encode files more easily. It uses TUI to create a lightweight console interface. To enable this, all you need to do is to clone the main repository and compile it as a binary with
-
-```Bash
-git clone "https://www.github.com/WrapFX/jampack.git"
-cd jampack
-cargo build --release
-```
-
-or download the precompiled binaries in the repo's release page.
-
-&nbsp;&nbsp;&nbsp;&nbsp;
-To decode assets at runtime, you need to open a new Jar.
+To decode assets at runtime, you can open a jar, which you can unpack in order to receive it's raw asset data.
 
 ```Rust
-use jampack::Jar;
 fn main() {
-    let my_asset = Jar::raw("res/image.jam")
+    let my_asset = jampack::jar("res/image")
         .unwrap();
+    let data = my_asset.unpack();
 }
 ```
 
-You can also open it as a prebuilt type,
+&nbsp;&nbsp;&nbsp;&nbsp;
+If the data type you want to decode implements the ```Jam``` trait, it can be done automatically!
 
 ```Rust
-use jampack::Jar;
-use image::DynamicImage as Image;
+use jampack::Jam;
 fn main() {
-    let my_asset = Jar::open<Image>("res/image.jam")
-        .unwrap();
-}
-```
-
-or implement your own types.
-
-```Rust
-use jampack::{Jar, Jam};
-fn main() {
-    let my_asset = Jar::open<MyType>("res/myasset.jam")
+    let my_asset = jampack::open<MyType>("res/my_asset")
         .unwrap();
 }
 
 struct MyType {}
 impl Jam for MyType {
-    fn encode(data: &[u8]) -> Result<&[u8], String> {
-        Ok(data)
-    }
-    
-    fn decode(data: &[u8]) -> Result<Self, String> {
+    fn unjar(ty: u8, data: Vec<u8>) -> jampack::Result<Self> {
         Ok(MyType {})
     }
 }
 ```
+
+&nbsp;&nbsp;&nbsp;&nbsp;
+Encoding data is done using a stove, which uses recipes in order to cook asset files. If the original asset hasn't been modified, it will skip it. It will also automatically remove deleted files.
+
+&nbsp;&nbsp;&nbsp;&nbsp;
+The recommended use of a stove is in build scripts.
+
+```Rust
+// build.rs
+const INPUT_DIR: &str = "./res-src";
+const OUT_DIR: &str   = "./res";
+
+fn main() {
+    let stove = jampack::Stove::new()
+        .unwrap()
+        .with_recipe(passthrough_recipe());
+    
+    stove.cook(INPUT_DIR, OUT_DIR);
+}
+
+fn passthrough_recipe() -> jampack::Recipe {
+    fn bake(data: Vec<u8>) -> jampack::Jar {
+        jampack::Jar::new(128, 0, data)
+    }
+    jampack::Recipe::new(bake, vec!["bin"])
+}
+```
+
+<div align="center">
+
+**Legal**
+
+Original jam icon used in JamPack logo made by lastspark from the Noun Project (licensed under CCBY 3.0 license)
+
+</div>

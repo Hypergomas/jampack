@@ -1,6 +1,7 @@
 use crate::Result;
 use crate::fs;
 use crate::Jam;
+use std::path::Path;
 
 pub struct Jar {
     pub(crate) cat: u8,
@@ -22,10 +23,28 @@ impl Jar {
         out.append(&mut self.data);
         out
     }
+
+    pub fn unpack(self) -> Vec<u8> {
+        self.data
+    }
+
+    pub fn cat(&self) -> u8 {
+        self.cat
+    }
+    pub fn ty(&self) -> u8 {
+        self.ty
+    }
+    pub fn data(&self) -> &Vec<u8> {
+        &self.data
+    }
 }
 
-pub async fn raw(asset: impl Into<String>) -> Result<Jar> {
-    match fs::read_to_bytes(asset).await {
+pub async fn jar(asset: impl Into<String>) -> Result<Jar> {
+    let asset = asset.into();
+    let path = Path::new(&asset)
+        .with_extension("jam");
+
+    match fs::read_to_bytes(path.to_str().unwrap()).await {
         Ok(b) => Ok(Jar::new(
             b[0],
             b[1],
@@ -36,8 +55,15 @@ pub async fn raw(asset: impl Into<String>) -> Result<Jar> {
 }
 
 pub async fn open<T: 'static + Jam>(asset: impl Into<String>) -> Result<T> {
-    let path = asset.into();
-    let raw = raw(path.clone())
+    let jar = jar(asset.into())
         .await?;
-    T::decode(raw.ty, raw.data)
+    if jar.cat != T::jam_idx() {
+        Err(format!(
+            "Cannot unjar asset. Provided type 'T' has jam index {}, jar has index {}.",
+            jar.cat,
+            T::jam_idx(),
+        ))
+    } else {
+        T::unjar(jar.ty, jar.data)
+    }
 }

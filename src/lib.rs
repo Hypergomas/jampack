@@ -9,11 +9,14 @@ mod native;
 pub(crate) use native::*;
 
 mod res;
+mod lock;
 mod jam;
 mod jar;
-mod builtin;
+mod stove;
+mod util;
 
 pub use res::*;
+pub(crate) use lock::*;
 pub use jam::*;
 pub use jar::*;
-pub use builtin::*;
+pub use stove::*;
