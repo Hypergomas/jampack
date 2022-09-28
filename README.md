@@ -5,7 +5,7 @@
 </div>
 
 &nbsp;&nbsp;&nbsp;&nbsp;
-JamPack is an extensible asset framework made for games and apps. You can cook files into jars by making recipes!
+JamPack is a lightweight, extensible asset framework made for use in games and apps. By default, it doesn't come with any encoders or decoders, but it's easy to make your own!
 
 &nbsp;&nbsp;&nbsp;&nbsp;
 To decode assets at runtime, you can open a jar, which you can unpack in order to receive it's raw asset data.
@@ -19,7 +19,7 @@ fn main() {
 ```
 
 &nbsp;&nbsp;&nbsp;&nbsp;
-You can also automatically decode it, if the provided type implements the ```Jam``` trait.
+If the data type you want to decode implements the ```Jam``` trait, it can be done automatically!
 
 ```Rust
 use jampack::Jam;
