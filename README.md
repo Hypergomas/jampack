@@ -4,8 +4,10 @@
 
 </div>
 
+**NOTE:** JamPack is currently being made as a highschooler's hobby project. Suggestions are very much appreciated!
+
 &nbsp;&nbsp;&nbsp;&nbsp;
-JamPack is a lightweight, extensible asset framework made for use in games and apps. By default, it doesn't come with any encoders or decoders, but it's easy to make your own!
+JamPack is a lightweight, asynchronous and extensible asset framework made for use in games and apps. By default, it doesn't come with any encoders or decoders, but it's easy to make your own!
 
 &nbsp;&nbsp;&nbsp;&nbsp;
 To decode assets at runtime, you can open a jar, which you can unpack in order to receive it's raw asset data.

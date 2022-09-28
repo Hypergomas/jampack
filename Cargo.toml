@@ -1,9 +1,9 @@
 [package]
 name = "jampack"
-version = "0.0.1"
+version = "1.0.0"
 edition = "2021"
 authors = ["WrapFX"]
-description = "Asynchronous asset encoding framework for apps and games"
+description = "Lightweight, asynchronous and extensible asset framework made for use in games and apps."
 license = "MIT"
 #license-file = "LICENSE"
 repository = "https://github.com/WrapFX/jampack"
