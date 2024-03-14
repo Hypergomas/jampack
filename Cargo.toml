@@ -1,6 +1,6 @@
 [package]
 name = "jampack"
-version = "0.1.0"
+version = "1.0.1"
 edition = "2021"
 authors = ["Arujano"]
 description = "Old project. Create a GitHub issue to request Crates.io ownership."
